@@ -1,0 +1,16 @@
+{
+  "assessmentId": "kw0pog5z",
+  "transcript": " Hello, hello, this is question number one.",
+  "evaluation": {
+    "cefr": "A1",
+    "score": 40,
+    "fluency": 2,
+    "grammar": 1,
+    "vocabulary": 1,
+    "pronunciation": 4,
+    "coherence": 1,
+    "feedback": "The speaker only produced a very short sentence which doesn't allow for a thorough evaluation. Nevertheless, the pronunciation seems natural and clear. However, fluency, grammar, vocabulary, and coherence were rated low due to the lack of content beyond a basic greeting and statement. The speaker is advised to construct more complex sentences and express more diverse thoughts in order to provide a more comprehensive evaluation."
+  },
+  "status": "complete",
+  "error": ""
+}

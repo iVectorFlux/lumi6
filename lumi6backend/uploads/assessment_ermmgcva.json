@@ -1,0 +1,16 @@
+{
+  "assessmentId": "ermmgcva",
+  "transcript": " N மاد Sorkana Chicken water Corn Baking powder 1 tbc 1 tbc 1 tbc 1 tbc 1 tbc 1 tbc 1 tbc",
+  "evaluation": {
+    "cefr": "A1",
+    "score": 15,
+    "fluency": 1,
+    "grammar": 1,
+    "vocabulary": 2,
+    "pronunciation": 1,
+    "coherence": 1,
+    "feedback": "The learner is able to recognize and use very basic English vocabulary, yet there is no syntactical structure to the phrases, and we can't evaluate fluency or grammar properly based on the given data. The coherence is also too low to be evaluated as the words do not form a coherent construct. Pronunciation cannot be assessed from a text. It is recommended to practice more on forming full sentences and using grammar structures."
+  },
+  "status": "complete",
+  "error": ""
+}

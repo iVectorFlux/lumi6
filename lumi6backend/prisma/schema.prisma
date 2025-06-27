@@ -1,0 +1,554 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  name               String
+  password           String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  companyId          String
+  role               AdminRole           @default(companyadmin)
+  company            Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdCandidates  Candidate[]         @relation("CandidateCreatedBy")
+  creditTransactions CreditTransaction[] @relation("CreditTransactionCreatedBy")
+  questions          SpeakingQuestion[]
+  tests              Test[]
+
+  @@index([role])
+  @@index([companyId])
+  @@index([email])
+}
+
+model Company {
+  id                         String                      @id @default(uuid())
+  name                       String
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  credits                    Int                         @default(0)
+  admins                     Admin[]
+  candidates                 Candidate[]
+  companyCredits             CompanyCredit[]
+  testPermissions            CompanyTestPermission[]
+  creditTransactions         CreditTransaction[]
+  eqQuestions                EQQuestion[]
+  eqTests                    EQTest[]
+  globalProficiencyQuestions GlobalProficiencyQuestion[]
+  proficiencyTests           ProficiencyTest[]
+  tests                      Test[]
+  writingQuestions           WritingQuestion[]           @relation("WritingQuestions")
+  writingTests               WritingTest[]
+
+  @@index([name])
+  @@index([createdAt])
+}
+
+model Candidate {
+  id               String            @id @default(uuid())
+  name             String
+  email            String
+  password         String
+  currentTestId    String?
+  companyId        String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  createdBy        String?
+  status           TestStatus        @default(active)
+  company          Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdByAdmin   Admin?            @relation("CandidateCreatedBy", fields: [createdBy], references: [id])
+  tests            CandidateTest[]
+  eqResults        EQResult[]
+  proficiencyTests ProficiencyTest[]
+  writingTests     WritingTest[]
+
+  @@unique([email, companyId])
+  @@index([companyId])
+  @@index([status])
+  @@index([email])
+  @@index([createdBy])
+  @@index([companyId, status, createdAt])
+  @@index([email, companyId])
+}
+
+model Test {
+  id                String          @id @default(uuid())
+  adminId           String
+  title             String          @default("CEFR Assessment")
+  description       String?
+  level             CEFRLevel?
+  createdAt         DateTime        @default(now())
+  status            TestStatus      @default(active)
+  selectionStrategy String          @default("random")
+  questionCount     Int             @default(5)
+  companyId         String
+  creditTransaction String?
+  creditsConsumed   Int             @default(1)
+  candidateTests    CandidateTest[]
+  admin             Admin           @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  company           Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  questions         TestQuestion[]
+
+  @@index([adminId])
+  @@index([companyId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([companyId, status, createdAt])
+}
+
+model SpeakingQuestion {
+  id                     String                  @id @default(uuid())
+  text                   String
+  type                   String
+  category               String
+  difficulty             CEFRLevel
+  mediaUrl               String?
+  adminId                String
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  language               String                  @default("en")
+  candidateTestQuestions CandidateTestQuestion[]
+  admin                  Admin                   @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  responses              Response[]
+  tests                  TestQuestion[]
+
+  @@index([adminId])
+  @@index([type])
+  @@index([category])
+  @@index([difficulty])
+  @@index([language])
+  @@index([type, difficulty, language])
+  @@map("Question")
+}
+
+model TestQuestion {
+  testId     String
+  questionId String
+  order      Int              @default(0)
+  question   SpeakingQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  test       Test             @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@id([testId, questionId])
+  @@index([testId])
+  @@index([questionId])
+}
+
+model CandidateTest {
+  id                   String                  @id @default(uuid())
+  candidateId          String
+  testId               String
+  currentQuestionIndex Int                     @default(0)
+  startedAt            DateTime?
+  completedAt          DateTime?
+  createdAt            DateTime                @default(now())
+  tabSwitchEvents      Json?
+  status               TestStatus              @default(active)
+  candidate            Candidate               @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  test                 Test                    @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questions            CandidateTestQuestion[]
+  responses            Response[]
+  result               TestResult?
+
+  @@unique([candidateId, testId, createdAt])
+  @@index([candidateId])
+  @@index([testId])
+  @@index([status])
+  @@index([completedAt])
+  @@index([candidateId, status])
+}
+
+model CandidateTestQuestion {
+  id              String           @id @default(uuid())
+  candidateTestId String
+  questionId      String
+  order           Int              @default(0)
+  candidateTest   CandidateTest    @relation(fields: [candidateTestId], references: [id], onDelete: Cascade)
+  question        SpeakingQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateTestId, questionId])
+  @@index([candidateTestId])
+  @@index([questionId])
+}
+
+model Response {
+  id              String           @id @default(uuid())
+  candidateTestId String
+  questionId      String
+  answer          String?
+  videoUrl        String?
+  transcription   String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  candidateTest   CandidateTest    @relation(fields: [candidateTestId], references: [id], onDelete: Cascade)
+  question        SpeakingQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([candidateTestId, questionId])
+  @@index([candidateTestId])
+  @@index([questionId])
+}
+
+model TestResult {
+  id                  String        @id @default(uuid())
+  candidateTestId     String        @unique
+  cefrLevel           CEFRLevel
+  overallScore        Int
+  feedback            String
+  speakingScore       Int
+  fluencyScore        Int
+  pronunciationScore  Int
+  grammarScore        Int
+  vocabularyScore     Int
+  timestamp           DateTime      @default(now())
+  videoUrl            String?
+  detailedAnalysis    Json?
+  confidenceScore     Int           @default(0)
+  grammarErrors       Json?
+  vocabularyUsage     Json?
+  pronunciationIssues Json?
+  fullTranscription   String?
+  candidateTest       CandidateTest @relation(fields: [candidateTestId], references: [id], onDelete: Cascade)
+
+  @@index([cefrLevel])
+  @@index([overallScore])
+  @@index([timestamp])
+}
+
+model GlobalProficiencyQuestion {
+  id            String   @id @default(uuid())
+  text          String
+  type          String
+  category      String
+  difficulty    String
+  options       Json?
+  correctAnswer String?
+  score         Int?
+  mediaUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  mediaAudio    String?
+  mediaImage    String?
+  companyId     String?
+  language      String   @default("en")
+  company       Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([type])
+  @@index([category])
+  @@index([difficulty])
+  @@index([language])
+  @@index([companyId])
+  @@index([type, difficulty, language])
+}
+
+model ProficiencyTest {
+  id                String     @id @default(uuid())
+  companyId         String
+  password          String
+  result            String?
+  score             Int?
+  answers           Json?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  completedAt       DateTime?
+  startedAt         DateTime?
+  status            TestStatus @default(active)
+  candidateId       String
+  creditTransaction String?
+  creditsConsumed   Int        @default(1)
+  candidate         Candidate  @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  company           Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([candidateId])
+  @@index([companyId])
+  @@index([status])
+  @@index([completedAt])
+  @@index([candidateId, companyId])
+}
+
+model EQQuestion {
+  id                  String       @id @default(uuid())
+  text                String
+  type                String
+  category            String
+  difficulty          String
+  options             Json?
+  scoring             Json?
+  mediaUrl            String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  companyId           String?
+  correctAnswer       String?
+  inconsistencyPairId String?
+  isActive            Boolean      @default(true)
+  isReversed          Boolean      @default(false)
+  module              String
+  normalizedScore     Int          @default(0)
+  submodule           String
+  weight              Float        @default(1.0)
+  language            String       @default("en")
+  company             Company?     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  responses           EQResponse[]
+
+  @@index([type])
+  @@index([module])
+  @@index([submodule])
+  @@index([isActive])
+  @@index([inconsistencyPairId])
+  @@index([language])
+  @@index([companyId])
+  @@index([module, submodule, isActive])
+}
+
+model EQTest {
+  id                String     @id @default(uuid())
+  title             String
+  description       String?
+  companyId         String
+  isActive          Boolean    @default(true)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  creditTransaction String?
+  creditsConsumed   Int        @default(1)
+  results           EQResult[]
+  company           Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([isActive])
+  @@index([companyId, isActive])
+}
+
+model EQResponse {
+  id         String     @id @default(uuid())
+  questionId String
+  resultId   String
+  answer     String
+  score      Float
+  createdAt  DateTime   @default(now())
+  question   EQQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  result     EQResult   @relation(fields: [resultId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+  @@index([resultId])
+}
+
+model EQResult {
+  id                  String       @id @default(uuid())
+  testId              String
+  candidateId         String
+  overallScore        Float
+  eqRating            String
+  moduleScores        Json
+  submoduleScores     Json
+  inconsistencyIndex  Float        @default(0)
+  inconsistencyRating String       @default("Very consistent")
+  inconsistencyPairs  Json?
+  completedAt         DateTime?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  responses           EQResponse[]
+  candidate           Candidate    @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  test                EQTest       @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@index([testId])
+  @@index([candidateId])
+  @@index([overallScore])
+  @@index([completedAt])
+  @@index([candidateId, testId])
+}
+
+model WritingTest {
+  id                String            @id @default(uuid())
+  title             String            @default("Writing Assessment")
+  description       String?
+  companyId         String
+  language          String            @default("en")
+  password          String
+  timeLimit         Int               @default(600)
+  startedAt         DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  status            TestStatus        @default(active)
+  candidateId       String
+  creditTransaction String?
+  creditsConsumed   Int               @default(1)
+  responses         WritingResponse[]
+  result            WritingResult?
+  candidate         Candidate         @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  company           Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([candidateId])
+  @@index([companyId])
+  @@index([language])
+  @@index([status])
+  @@index([completedAt])
+  @@index([candidateId, companyId])
+}
+
+model WritingQuestion {
+  id        String            @id @default(uuid())
+  type      String
+  title     String
+  prompt    String
+  imageUrl  String?
+  order     Int
+  language  String            @default("en")
+  companyId String?
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  company   Company?          @relation("WritingQuestions", fields: [companyId], references: [id], onDelete: Cascade)
+  responses WritingResponse[]
+
+  @@index([type])
+  @@index([order])
+  @@index([language])
+  @@index([companyId])
+  @@index([isActive])
+  @@index([type, language, isActive])
+}
+
+model WritingResponse {
+  id         String          @id @default(uuid())
+  testId     String
+  questionId String
+  answer     String
+  wordCount  Int             @default(0)
+  timeSpent  Int             @default(0)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  question   WritingQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  test       WritingTest     @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@unique([testId, questionId])
+  @@index([testId])
+  @@index([questionId])
+}
+
+model WritingResult {
+  id               String      @id @default(uuid())
+  testId           String      @unique
+  cefrLevel        CEFRLevel
+  overallScore     Int
+  grammarScore     Int
+  coherenceScore   Int
+  rangeScore       Int
+  vocabularyScore  Int
+  commandScore     Int
+  feedback         String
+  detailedAnalysis Json?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  test             WritingTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@index([cefrLevel])
+  @@index([overallScore])
+  @@index([createdAt])
+}
+
+model CompanyTestPermission {
+  id        String   @id @default(uuid())
+  companyId String
+  testType  TestType
+  isEnabled Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, testType])
+  @@index([companyId])
+  @@index([testType])
+  @@index([isEnabled])
+  @@index([companyId, testType, isEnabled])
+}
+
+model CompanyCredit {
+  id               String    @id @default(uuid())
+  companyId        String
+  testType         TestType
+  totalCredits     Int       @default(0)
+  usedCredits      Int       @default(0)
+  availableCredits Int       @default(0)
+  expiryDate       DateTime?
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  company          Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, testType])
+  @@index([companyId])
+  @@index([testType])
+  @@index([expiryDate])
+  @@index([isActive])
+  @@index([companyId, testType, isActive])
+  @@index([expiryDate, isActive])
+}
+
+model CreditTransaction {
+  id              String                @id @default(uuid())
+  companyId       String
+  testType        TestType
+  transactionType CreditTransactionType
+  amount          Int
+  balanceBefore   Int
+  balanceAfter    Int
+  description     String?
+  referenceId     String?
+  referenceType   String?
+  createdBy       String?
+  createdAt       DateTime              @default(now())
+  company         Company               @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdByAdmin  Admin?                @relation("CreditTransactionCreatedBy", fields: [createdBy], references: [id])
+
+  @@index([companyId])
+  @@index([testType])
+  @@index([transactionType])
+  @@index([createdAt])
+  @@index([referenceId])
+  @@index([referenceType])
+  @@index([createdBy])
+  @@index([companyId, testType, createdAt])
+  @@index([companyId, transactionType, createdAt])
+}
+
+enum TestStatus {
+  active
+  completed
+  expired
+}
+
+enum CEFRLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+enum AdminRole {
+  superadmin
+  companyadmin
+  companymanager
+}
+
+enum TestType {
+  SPEAKING
+  PROFICIENCY
+  EQ
+  WRITING
+}
+
+enum CreditTransactionType {
+  PURCHASE
+  CONSUMPTION
+  REFUND
+  ADJUSTMENT
+  EXPIRY
+}

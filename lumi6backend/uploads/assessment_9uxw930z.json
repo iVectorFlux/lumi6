@@ -1,0 +1,17 @@
+{
+  "assessmentId": "9uxw930z",
+  "transcript": "so um so so so so okay so so you",
+  "evaluation": {
+    "cefr": "A1",
+    "score": 20,
+    "fluency": 1,
+    "grammar": 1,
+    "vocabulary": 1,
+    "pronunciation": 3,
+    "coherence": 1,
+    "feedback": "The test taker provided a very limited response with frequent repetition of the word 'so', suggesting a lack of vocabulary and difficulty constructing sentences in English. They demonstrated a very basic level of fluency and coherence. Grammar usage could not be judged properly due to the lack of sentence variety. Despite this, the pronunciation of the words spoken appeared to be clear. This test taker needs a lot of improvement in all areas, particularly in expanding their vocabulary and understanding of English grammar, in order to improve overall coherence and fluency."
+  },
+  "status": "complete",
+  "error": "",
+  "candidateTestId": "b640b710-bfeb-4d32-81c5-8bd4b7310079"
+}

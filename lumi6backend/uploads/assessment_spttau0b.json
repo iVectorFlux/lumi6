@@ -1,0 +1,7 @@
+{
+  "assessmentId": "spttau0b",
+  "transcript": "",
+  "evaluation": {},
+  "status": "error",
+  "error": "spawnSync /bin/sh ENOBUFS"
+}

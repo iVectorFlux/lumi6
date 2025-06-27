@@ -1,0 +1,17 @@
+{
+  "assessmentId": "mirq3dsr",
+  "transcript": "Okay. Okay. Okay. Okay. Okay. Okay. Okay. Okay. ",
+  "evaluation": {
+    "cefr": "A1",
+    "score": 10,
+    "fluency": 1,
+    "grammar": 1,
+    "vocabulary": 1,
+    "pronunciation": 5,
+    "coherence": 1,
+    "feedback": "The candidate repeated one word, 'Okay', throughout the test. Although the pronunciation of this word was good, the candidate failed to demonstrate the ability to construct sentences, use diverse vocabulary, and engage in a coherent conversation. As such, the candidate's performance is indicative of an initial starting point in learning (CEFR Level A1). Improvement is needed in all areas, except pronunciation, where the candidate performed well with the one word that was used."
+  },
+  "status": "complete",
+  "error": "",
+  "candidateTestId": ""
+}

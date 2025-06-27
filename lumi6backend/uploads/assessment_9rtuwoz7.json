@@ -1,0 +1,17 @@
+{
+  "assessmentId": "9rtuwoz7",
+  "transcript": "Hello, ladies and gentlemen, this is your captain speaking. And today I will be going to do something good for you. And let's see.",
+  "evaluation": {
+    "cefr": "A2",
+    "score": 70,
+    "fluency": 3,
+    "grammar": 4,
+    "vocabulary": 3,
+    "pronunciation": 3,
+    "coherence": 3,
+    "feedback": "The speaker demonstrates basic competency in English communication, with no significant grammatical errors. However, the speech lacks complexity and variety in vocabulary and structure. The topic of the speech is also unclear, making it hard to follow. The speaker is encouraged to develop their message more fully and use a wider range of vocabulary and sentence structures."
+  },
+  "status": "complete",
+  "error": "",
+  "candidateTestId": "04d49b29-2d8f-42b1-a16d-b4d3c2868ca5"
+}

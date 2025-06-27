@@ -1,0 +1,17 @@
+{
+  "assessmentId": "phgqh1od",
+  "transcript": "Okay. Okay. Okay. Okay. Okay. Okay. Okay. Okay. Okay. Okay. Okay. Okay. Okay.",
+  "evaluation": {
+    "cefr": "A1",
+    "score": 10,
+    "fluency": 1,
+    "grammar": 1,
+    "vocabulary": 1,
+    "pronunciation": 5,
+    "coherence": 1,
+    "feedback": "The test taker only repeated a single phrase, 'Okay'. There was no sentence or conversation structure, no use of varied vocabulary, and no meaningful content. However, the pronunciation appeared to be good, but this is difficult to evaluate fully with only one word. The test taker should work on effectively using the English language in full conversations with a range of vocabulary, grammar and coherent discourse."
+  },
+  "status": "complete",
+  "error": "",
+  "candidateTestId": ""
+}

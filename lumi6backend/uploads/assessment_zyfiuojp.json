@@ -1,0 +1,7 @@
+{
+  "assessmentId": "zyfiuojp",
+  "transcript": "",
+  "evaluation": {},
+  "status": "error",
+  "error": "Command failed: ffmpeg -y -i \"/Users/Lumi6/Lexiscore/cefr-fluent-hub-main/lexiscore-backend/uploads/1749651735760-345674996.webm\" -acodec libvorbis \"/Users/Lumi6/Lexiscore/cefr-fluent-hub-main/lexiscore-backend/uploads/1749651735760-345674996.webm.ogg\"\n/bin/sh: ffmpeg: command not found\n"
+}
