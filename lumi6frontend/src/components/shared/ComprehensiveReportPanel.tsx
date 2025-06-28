@@ -133,8 +133,8 @@ export const ComprehensiveReportPanel = ({
   
   const hasPermission = (testType: string) => {
     if (!permissions) return true; // Default to showing all if permissions not loaded
-    const permission = permissions.find(p => p.testType.toLowerCase() === testType.toLowerCase());
-    return permission?.isEnabled ?? true;
+    // permissions is an array of TestType strings, not objects
+    return permissions.some(permission => permission.toLowerCase() === testType.toLowerCase());
   };
 
   useEffect(() => {

@@ -546,4 +546,132 @@ router.get('/:id/complete-profile', async (req, res) => {
   }
 });
 
+// Get enhanced single candidate data with all test results (standalone route)
+router.get('/:candidateId/enhanced', async (req, res) => {
+  const { candidateId } = req.params;
+  
+  try {
+    const candidate = await prisma.candidate.findUnique({
+      where: { id: candidateId },
+      include: {
+        tests: {
+          include: { result: true },
+          orderBy: { createdAt: 'desc' }
+        },
+        proficiencyTests: {
+          orderBy: { createdAt: 'desc' }
+        },
+        eqResults: {
+          orderBy: { createdAt: 'desc' }
+        },
+        writingTests: {
+          include: { result: true },
+          orderBy: { createdAt: 'desc' }
+        },
+        createdByAdmin: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true
+          }
+        }
+      }
+    });
+    
+    if (!candidate) {
+      return res.status(404).json({ error: 'Candidate not found' });
+    }
+
+    // Process ALL Speaking test results (from CandidateTest)
+    const speakingTests = candidate.tests.map(test => ({
+      id: test.id,
+      status: test.result ? 'completed' as const : 'pending' as const,
+      score: test.result?.overallScore || null,
+      level: test.result?.cefrLevel || null,
+      completedAt: test.result?.timestamp?.toISOString() || test.createdAt.toISOString(),
+      createdAt: test.createdAt.toISOString(),
+      fluencyScore: test.result?.fluencyScore || null,
+      pronunciationScore: test.result?.pronunciationScore || null,
+      grammarScore: test.result?.grammarScore || null,
+      vocabularyScore: test.result?.vocabularyScore || null
+    }));
+
+    // Process ALL Proficiency test results
+    const proficiencyTests = candidate.proficiencyTests.map(test => ({
+      id: test.id,
+      status: 'completed' as const,
+      score: test.score,
+      level: test.result,
+      completedAt: (test.completedAt || test.updatedAt).toISOString(),
+      createdAt: test.createdAt.toISOString()
+    }));
+
+    // Process ALL EQ test results
+    const eqTests = candidate.eqResults.map(result => ({
+      id: result.id,
+      status: 'completed' as const,
+      score: Math.round(result.overallScore),
+      level: result.eqRating,
+      completedAt: result.createdAt.toISOString(),
+      createdAt: result.createdAt.toISOString(),
+      // Add detailed EQ scores from JSON fields
+      moduleScores: result.moduleScores,
+      submoduleScores: result.submoduleScores,
+      inconsistencyIndex: result.inconsistencyIndex,
+      inconsistencyRating: result.inconsistencyRating
+    }));
+
+    // Process ALL Writing test results
+    const writingTests = candidate.writingTests.map(test => ({
+      id: test.id,
+      status: test.result ? 'completed' as const : 'pending' as const,
+      score: test.result?.overallScore || null,
+      level: test.result?.cefrLevel || null,
+      completedAt: test.result?.createdAt?.toISOString() || test.createdAt.toISOString(),
+      createdAt: test.createdAt.toISOString()
+    }));
+
+    // Calculate overall progress and metrics
+    const allTests = [...speakingTests, ...proficiencyTests, ...eqTests, ...writingTests];
+    const completedTests = allTests.filter(test => test.status === 'completed');
+    const totalTests = allTests.length;
+    const progressPercentage = totalTests > 0 ? Math.round((completedTests.length / totalTests) * 100) : 0;
+
+    const enhancedCandidate = {
+      id: candidate.id,
+      firstName: candidate.name.split(' ')[0] || candidate.name,
+      lastName: candidate.name.split(' ').slice(1).join(' ') || '',
+      email: candidate.email,
+      status: candidate.status,
+      createdAt: candidate.createdAt.toISOString(),
+      companyId: candidate.companyId,
+      
+      // Test results with full history
+      speakingTests: speakingTests,
+      proficiencyTests: proficiencyTests,
+      eqTests: eqTests,
+      writingTests: writingTests,
+      
+      // Summary data
+      totalTestsCompleted: completedTests.length,
+      totalTestsAssigned: totalTests,
+      progressPercentage: progressPercentage,
+      
+      // Latest results for quick access
+      latestSpeaking: speakingTests.length > 0 ? speakingTests[0] : null,
+      latestProficiency: proficiencyTests.length > 0 ? proficiencyTests[0] : null,
+      latestEQ: eqTests.length > 0 ? eqTests[0] : null,
+      latestWriting: writingTests.length > 0 ? writingTests[0] : null,
+      
+      createdBy: candidate.createdByAdmin
+    };
+
+    res.json(enhancedCandidate);
+  } catch (error) {
+    console.error('Error fetching enhanced candidate:', error);
+    res.status(500).json({ error: 'Failed to fetch candidate data' });
+  }
+});
+
 export default router; 

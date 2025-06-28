@@ -130,8 +130,8 @@ const CandidateProfilePanel = ({ candidateId, onBack, companyId }: CandidateProf
   
   const hasPermission = (testType: string) => {
     if (!permissions) return true; // Show all while loading
-    const permission = permissions.find(p => p.testType.toLowerCase() === testType.toLowerCase());
-    return permission?.isEnabled ?? false;
+    // permissions is an array of TestType strings, not objects
+    return permissions.some(permission => permission.toLowerCase() === testType.toLowerCase());
   };
 
   // Loading skeleton
