@@ -284,26 +284,31 @@ export default function EQCandidateTest() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {currentQuestion.options.map((opt: any, index) => {
-                const value = typeof opt === 'string' ? opt : opt.value;
-                const label = typeof opt === 'string' ? opt : opt.label;
-                return (
-                  <label
-                    key={value}
-                    className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      name={`question_${currentQuestion.id}`}
-                      value={value}
-                      checked={answers[currentQuestion.id] === value}
-                      onChange={() => handleAnswer(currentQuestion.id, value)}
-                      className="text-purple-600"
-                    />
-                    <span className="flex-1">{label}</span>
-                  </label>
-                );
-              })}
+              {[...currentQuestion.options]
+                .sort((a: any, b: any) => {
+                  const scoreA = typeof a === 'string' ? 0 : (a.score ?? 0);
+                  const scoreB = typeof b === 'string' ? 0 : (b.score ?? 0);
+                  return scoreB - scoreA; // highest score first
+                })
+                .map((opt: any, index) => {
+                  const value = typeof opt === 'string' ? opt : opt.value;
+                  const label = typeof opt === 'string' ? opt : opt.label;
+                  return (
+                    <label
+                      key={value}
+                      className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name={`question_${currentQuestion.id}`}
+                        value={value}
+                        checked={answers[currentQuestion.id] === value}
+                        onChange={() => handleAnswer(currentQuestion.id, value)}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  );
+                })}
             </div>
           </CardContent>
         </Card>

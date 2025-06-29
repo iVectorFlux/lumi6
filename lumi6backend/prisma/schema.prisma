@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-arm64-openssl-1.1.x"]
+  binaryTargets = ["native", "linux-arm64-openssl-1.1.x", "linux-musl-arm64-openssl-3.0.x"]
 }
 
 datasource db {
@@ -31,13 +31,12 @@ model Admin {
 model Company {
   id                         String                      @id @default(uuid())
   name                       String
+  subdomain                  String?
   createdAt                  DateTime                    @default(now())
   updatedAt                  DateTime                    @updatedAt
-  credits                    Int                         @default(0)
   admins                     Admin[]
   candidates                 Candidate[]
-  companyCredits             CompanyCredit[]
-  testPermissions            CompanyTestPermission[]
+  testConfigs                CompanyTestConfig[]
   creditTransactions         CreditTransaction[]
   eqQuestions                EQQuestion[]
   eqTests                    EQTest[]
@@ -49,6 +48,7 @@ model Company {
 
   @@index([name])
   @@index([createdAt])
+  @@index([subdomain])
 }
 
 model Candidate {
@@ -452,40 +452,39 @@ model WritingResult {
   @@index([createdAt])
 }
 
-model CompanyTestPermission {
-  id        String   @id @default(uuid())
-  companyId String
-  testType  TestType
-  isEnabled Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-  @@unique([companyId, testType])
-  @@index([companyId])
-  @@index([testType])
-  @@index([isEnabled])
-  @@index([companyId, testType, isEnabled])
-}
 
-model CompanyCredit {
+model CompanyTestConfig {
   id               String    @id @default(uuid())
   companyId        String
   testType         TestType
+  
+  // Permission Control
+  isEnabled        Boolean   @default(true)
+  
+  // Credit Management
   totalCredits     Int       @default(0)
   usedCredits      Int       @default(0)
   availableCredits Int       @default(0)
+  
+  // Additional Features
   expiryDate       DateTime?
   isActive         Boolean   @default(true)
+  maxDailyTests    Int?      // Optional: daily test limits
+  
+  // Audit Fields
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  
+  // Relations
   company          Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, testType])
   @@index([companyId])
   @@index([testType])
-  @@index([expiryDate])
+  @@index([isEnabled])
   @@index([isActive])
+  @@index([companyId, testType, isEnabled])
   @@index([companyId, testType, isActive])
   @@index([expiryDate, isActive])
 }

@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TestType } from '@prisma/client';
 import { mapScoreToCEFR, API_DEFAULTS, PROFICIENCY_TEST_CONFIG } from '../config/constants';
 import crypto from 'crypto';
+import { creditService } from '../services/creditService';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -85,7 +86,7 @@ router.post('/:testId/submit', async (req, res) => {
       }
     }
     const result = mapScoreToCEFR(score);
-    await prisma.proficiencyTest.update({
+    const updatedTest = await prisma.proficiencyTest.update({
       where: { id: testId },
       data: {
         status: 'completed',
@@ -95,6 +96,20 @@ router.post('/:testId/submit', async (req, res) => {
         completedAt: new Date(),
       },
     });
+
+    // Consume credits now that the proficiency test is completed
+    try {
+      await creditService.consumeCredits(
+        updatedTest.companyId || '',
+        TestType.PROFICIENCY,
+        1,
+        updatedTest.id,
+        'test_completion'
+      );
+    } catch (creditError) {
+      console.error('Error consuming credits (Proficiency test completion):', creditError);
+    }
+
     res.json({ score, result });
   } catch (err) {
     res.status(500).json({ error: 'Failed to submit answers' });

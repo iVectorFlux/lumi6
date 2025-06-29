@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TestType } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { authenticateToken } from '../middleware/auth';
 import { sendSuccess, sendError } from '../utils/apiResponse';
 import logger from '../utils/logger';
+import { creditService } from '../services/creditService';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -111,10 +112,12 @@ router.post('/create', authenticateToken, async (req, res) => {
 
     return sendSuccess(res, {
       testId: writingTest.id,
-      password: testPasswordPlain,
       testLink: `${frontendUrl}/candidate/writing-test/${writingTest.id}`,
       candidateId: candidate.id,
-      candidatePassword: candidatePasswordPlain
+      candidateName,
+      login: candidateEmail,
+      password: candidatePasswordPlain,
+      testPassword: testPasswordPlain
     }, 201);
 
   } catch (error) {
@@ -503,6 +506,19 @@ Return ONLY JSON:
         }
       }
     });
+
+    // Consume credits now that the writing test is completed
+    try {
+      await creditService.consumeCredits(
+        writingTest.companyId,
+        TestType.WRITING,
+        1,
+        testId,
+        'test_completion'
+      );
+    } catch (creditError) {
+      console.error('Error consuming credits (Writing test completion):', creditError);
+    }
 
     logger.info(`Writing test ${testId} evaluated successfully`);
 

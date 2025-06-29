@@ -1,16 +1,8 @@
 import express from 'express';
-import { PrismaClient, TestStatus } from '@prisma/client';
+import { PrismaClient, TestStatus, TestType } from '@prisma/client';
 import EQEvaluationService from '../services/eqEvaluationService';
 import { validateCreditsAndPermissions, consumeCreditsAfterTest } from '../middleware/creditValidation';
 import { creditService } from '../services/creditService';
-
-// Define TestType enum locally until Prisma client is regenerated
-enum TestType {
-  SPEAKING = 'SPEAKING',
-  PROFICIENCY = 'PROFICIENCY',
-  EQ = 'EQ',
-  WRITING = 'WRITING'
-}
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -330,32 +322,14 @@ router.post('/tests/create',
     });
 
     // Generate test credentials
-    const testId = test.id;
     const password = Math.random().toString(36).slice(-8);
-    
-    // Consume credits for the test
-    const creditResult = await creditService.consumeCredits(
-      companyId,
-      TestType.EQ,
-      1,
-      testId,
-      'eq_test'
-    );
-
-    if (!creditResult.success) {
-      // If credit consumption fails, we should ideally rollback the test creation
-      // For now, log the error but don't fail the test creation
-      console.error('Failed to consume EQ test credits:', creditResult.error);
-    } else {
-      console.log('Successfully consumed 1 EQ credit, transaction ID:', creditResult.transactionId);
-    }
 
     // Create test link
     const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const testLink = `${baseUrl}/eq-test/${testId}?candidate=${candidate.id}`;
+    const testLink = `${baseUrl}/eq-test/${test.id}?candidate=${candidate.id}`;
 
     res.status(201).json({
-      testId,
+      testId: test.id,
       candidateId: candidate.id,
       password,
       testLink,
@@ -545,6 +519,24 @@ router.post('/tests/:testId/submit', async (req, res) => {
       scoredResponses,
       evaluation
     );
+
+    // Consume credit now that the test is completed
+    try {
+      const creditResult = await creditService.consumeCredits(
+        test.companyId,
+        TestType.EQ,
+        1,
+        resultId,
+        'test_completion'
+      );
+
+      if (!creditResult.success) {
+        console.error('Failed to consume EQ test credits after completion:', creditResult.error);
+      }
+    } catch (creditError) {
+      console.error('Error consuming credits (EQ test completion):', creditError);
+    }
+
     console.log('Successfully saved result with ID:', resultId);
 
     res.json({

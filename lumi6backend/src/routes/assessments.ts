@@ -4,7 +4,8 @@ import path from 'path';
 import fs from 'fs';
 import axios from 'axios';
 import OpenAI from 'openai';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TestType } from '@prisma/client';
+import { creditService } from '../services/creditService';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -187,7 +188,7 @@ router.post('/concatenated', upload.single('audioFile'), async (req, res) => {
               });
               
               // Create test result
-              await prisma.testResult.create({
+              const testResult = await prisma.testResult.create({
                 data: {
                   candidateTestId: latestTest.id,
                   cefrLevel: evaluation.cefr as any,
@@ -215,6 +216,19 @@ router.post('/concatenated', upload.single('audioFile'), async (req, res) => {
                 where: { id: candidate.id },
                 data: { status: 'completed' }
               });
+              
+              // Consume credits for completion (fallback path)
+              try {
+                await creditService.consumeCredits(
+                  candidate.companyId,
+                  TestType.SPEAKING,
+                  1,
+                  latestTest.testId,
+                  'test_completion'
+                );
+              } catch (creditError) {
+                console.error('Error consuming credits (Speaking test completion - alt path):', creditError);
+              }
               
               console.log('Database updated successfully using alternative candidateTest');
             }
@@ -252,6 +266,19 @@ router.post('/concatenated', upload.single('audioFile'), async (req, res) => {
               }
             }
           });
+
+          // Consume credits now that the speaking test is completed
+          try {
+            await creditService.consumeCredits(
+              existingCandidateTest.candidate.companyId,
+              TestType.SPEAKING,
+              1,
+              existingCandidateTest.testId,
+              'test_completion'
+            );
+          } catch (creditError) {
+            console.error('Error consuming credits (Speaking test completion):', creditError);
+          }
 
           // Update candidate status to completed
           await prisma.candidate.update({

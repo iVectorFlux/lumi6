@@ -38,31 +38,32 @@ export class CreditService {
     description?: string
   ): Promise<void> {
     await prisma.$transaction(async (tx) => {
-      // Get or create company credit record
-      let companyCredit = await tx.companyCredit.findUnique({
+      // Get or create company test config record
+      let companyTestConfig = await tx.companyTestConfig.findUnique({
         where: { companyId_testType: { companyId, testType } }
       });
 
-      const balanceBefore = companyCredit?.availableCredits || 0;
+      const balanceBefore = companyTestConfig?.availableCredits || 0;
       const balanceAfter = balanceBefore + amount;
 
-      if (companyCredit) {
-        // Update existing credit record
-        await tx.companyCredit.update({
-          where: { id: companyCredit.id },
+      if (companyTestConfig) {
+        // Update existing config record
+        await tx.companyTestConfig.update({
+          where: { id: companyTestConfig.id },
           data: {
             totalCredits: { increment: amount },
             availableCredits: { increment: amount },
-            expiryDate: expiryDate || companyCredit.expiryDate,
+            expiryDate: expiryDate || companyTestConfig.expiryDate,
             updatedAt: new Date()
           }
         });
       } else {
-        // Create new credit record
-        await tx.companyCredit.create({
+        // Create new config record
+        await tx.companyTestConfig.create({
           data: {
             companyId,
             testType,
+            isEnabled: true, // Enable by default when assigning credits
             totalCredits: amount,
             usedCredits: 0,
             availableCredits: amount,
@@ -101,40 +102,35 @@ export class CreditService {
   ): Promise<{ success: boolean; transactionId?: string; error?: string }> {
     try {
       const result = await prisma.$transaction(async (tx) => {
-        // Check if company has permission for this test type
-        const permission = await tx.companyTestPermission.findUnique({
+        // Get company test config
+        const companyConfig = await tx.companyTestConfig.findUnique({
           where: { companyId_testType: { companyId, testType } }
         });
 
-        if (!permission || !permission.isEnabled) {
+        if (!companyConfig || !companyConfig.isEnabled) {
           throw new Error(`Company not authorized for ${testType} tests`);
         }
 
-        // Get company credit record
-        const companyCredit = await tx.companyCredit.findUnique({
-          where: { companyId_testType: { companyId, testType } }
-        });
-
-        if (!companyCredit || !companyCredit.isActive) {
-          throw new Error(`No active credits found for ${testType} tests`);
+        if (!companyConfig.isActive) {
+          throw new Error(`${testType} test configuration is not active`);
         }
 
         // Check if credits have expired
-        if (companyCredit.expiryDate && companyCredit.expiryDate < new Date()) {
+        if (companyConfig.expiryDate && companyConfig.expiryDate < new Date()) {
           throw new Error(`Credits for ${testType} tests have expired`);
         }
 
         // Check if sufficient credits available
-        if (companyCredit.availableCredits < amount) {
-          throw new Error(`Insufficient ${testType} credits. Available: ${companyCredit.availableCredits}, Required: ${amount}`);
+        if (companyConfig.availableCredits < amount) {
+          throw new Error(`Insufficient ${testType} credits. Available: ${companyConfig.availableCredits}, Required: ${amount}`);
         }
 
-        const balanceBefore = companyCredit.availableCredits;
+        const balanceBefore = companyConfig.availableCredits;
         const balanceAfter = balanceBefore - amount;
 
-        // Update credit record
-        await tx.companyCredit.update({
-          where: { id: companyCredit.id },
+        // Update config record
+        await tx.companyTestConfig.update({
+          where: { id: companyConfig.id },
           data: {
             usedCredits: { increment: amount },
             availableCredits: { decrement: amount },
@@ -173,18 +169,18 @@ export class CreditService {
    * Get company credit balances for all test types
    */
   async getCompanyCredits(companyId: string): Promise<CreditBalance[]> {
-    const credits = await prisma.companyCredit.findMany({
+    const configs = await prisma.companyTestConfig.findMany({
       where: { companyId },
       orderBy: { testType: 'asc' }
     });
 
-    return credits.map(credit => ({
-      testType: credit.testType,
-      totalCredits: credit.totalCredits,
-      usedCredits: credit.usedCredits,
-      availableCredits: credit.availableCredits,
-      expiryDate: credit.expiryDate || undefined,
-      isActive: credit.isActive
+    return configs.map(config => ({
+      testType: config.testType,
+      totalCredits: config.totalCredits,
+      usedCredits: config.usedCredits,
+      availableCredits: config.availableCredits,
+      expiryDate: config.expiryDate || undefined,
+      isActive: config.isActive
     }));
   }
 
@@ -192,14 +188,14 @@ export class CreditService {
    * Get credit balance for a specific test type
    */
   async getCreditBalance(companyId: string, testType: TestType): Promise<number> {
-    const credit = await prisma.companyCredit.findUnique({
+    const config = await prisma.companyTestConfig.findUnique({
       where: { companyId_testType: { companyId, testType } }
     });
 
-    if (!credit || !credit.isActive) return 0;
-    if (credit.expiryDate && credit.expiryDate < new Date()) return 0;
+    if (!config || !config.isActive || !config.isEnabled) return 0;
+    if (config.expiryDate && config.expiryDate < new Date()) return 0;
 
-    return credit.availableCredits;
+    return config.availableCredits;
   }
 
   // ============================================================================
@@ -211,18 +207,39 @@ export class CreditService {
    */
   async setTestPermissions(companyId: string, permissions: TestType[]): Promise<void> {
     await prisma.$transaction(async (tx) => {
-      // Remove all existing permissions
-      await tx.companyTestPermission.deleteMany({
+      // Get all existing configs for this company
+      const existingConfigs = await tx.companyTestConfig.findMany({
         where: { companyId }
       });
 
-      // Add new permissions
-      if (permissions.length > 0) {
-        await tx.companyTestPermission.createMany({
-          data: permissions.map(testType => ({
+      // Update existing configs
+      for (const config of existingConfigs) {
+        const shouldBeEnabled = permissions.includes(config.testType);
+        if (config.isEnabled !== shouldBeEnabled) {
+          await tx.companyTestConfig.update({
+            where: { id: config.id },
+            data: { 
+              isEnabled: shouldBeEnabled,
+              updatedAt: new Date()
+            }
+          });
+        }
+      }
+
+      // Create configs for new permissions that don't exist yet
+      const existingTestTypes = existingConfigs.map(c => c.testType);
+      const newPermissions = permissions.filter(p => !existingTestTypes.includes(p));
+      
+      if (newPermissions.length > 0) {
+        await tx.companyTestConfig.createMany({
+          data: newPermissions.map(testType => ({
             companyId,
             testType,
-            isEnabled: true
+            isEnabled: true,
+            totalCredits: 0,
+            usedCredits: 0,
+            availableCredits: 0,
+            isActive: true
           }))
         });
       }
@@ -233,33 +250,48 @@ export class CreditService {
    * Check if company has permission for a test type
    */
   async hasTestPermission(companyId: string, testType: TestType): Promise<boolean> {
-    const permission = await prisma.companyTestPermission.findUnique({
+    const config = await prisma.companyTestConfig.findUnique({
       where: { companyId_testType: { companyId, testType } }
     });
 
-    return permission ? permission.isEnabled : false;
+    return config ? config.isEnabled && config.isActive : false;
   }
 
   /**
    * Get all test permissions for a company
    */
   async getCompanyPermissions(companyId: string): Promise<TestType[]> {
-    const permissions = await prisma.companyTestPermission.findMany({
-      where: { companyId, isEnabled: true },
+    const configs = await prisma.companyTestConfig.findMany({
+      where: { 
+        companyId, 
+        isEnabled: true,
+        isActive: true
+      },
       select: { testType: true }
     });
 
-    return permissions.map(p => p.testType);
+    return configs.map(c => c.testType);
   }
 
   /**
    * Enable/disable a specific test permission
    */
   async toggleTestPermission(companyId: string, testType: TestType, isEnabled: boolean): Promise<void> {
-    await prisma.companyTestPermission.upsert({
+    await prisma.companyTestConfig.upsert({
       where: { companyId_testType: { companyId, testType } },
-      update: { isEnabled, updatedAt: new Date() },
-      create: { companyId, testType, isEnabled }
+      update: { 
+        isEnabled, 
+        updatedAt: new Date() 
+      },
+      create: { 
+        companyId, 
+        testType, 
+        isEnabled,
+        totalCredits: 0,
+        usedCredits: 0,
+        availableCredits: 0,
+        isActive: true
+      }
     });
   }
 
@@ -318,21 +350,21 @@ export class CreditService {
       const companyId = originalTransaction.companyId;
       const testType = originalTransaction.testType;
 
-      // Get current credit record
-      const companyCredit = await tx.companyCredit.findUnique({
+      // Get current config record
+      const companyConfig = await tx.companyTestConfig.findUnique({
         where: { companyId_testType: { companyId, testType } }
       });
 
-      if (!companyCredit) {
-        throw new Error('Company credit record not found');
+      if (!companyConfig) {
+        throw new Error('Company test configuration not found');
       }
 
-      const balanceBefore = companyCredit.availableCredits;
+      const balanceBefore = companyConfig.availableCredits;
       const balanceAfter = balanceBefore + refundAmount;
 
-      // Update credit record
-      await tx.companyCredit.update({
-        where: { id: companyCredit.id },
+      // Update config record
+      await tx.companyTestConfig.update({
+        where: { id: companyConfig.id },
         data: {
           usedCredits: { decrement: refundAmount },
           availableCredits: { increment: refundAmount },
@@ -397,115 +429,145 @@ export class CreditService {
   }
 
   /**
-   * Get global credit usage statistics (for super admin)
+   * Get global credit statistics for super admin
    */
   async getGlobalCreditStats() {
-    const stats = await prisma.companyCredit.groupBy({
-      by: ['testType'],
-      _sum: {
+    const totalCompanies = await prisma.company.count();
+    
+    const configs = await prisma.companyTestConfig.findMany({
+      where: { isActive: true },
+      select: {
+        testType: true,
         totalCredits: true,
         usedCredits: true,
         availableCredits: true
-      },
-      _count: {
-        id: true
       }
     });
 
-    return stats.map(stat => ({
-      testType: stat.testType,
-      totalCredits: stat._sum.totalCredits || 0,
-      usedCredits: stat._sum.usedCredits || 0,
-      availableCredits: stat._sum.availableCredits || 0,
-      companies: stat._count.id
-    }));
+    const stats = configs.reduce((acc, config) => {
+      if (!acc[config.testType]) {
+        acc[config.testType] = {
+          totalCredits: 0,
+          usedCredits: 0,
+          availableCredits: 0,
+          companies: 0
+        };
+      }
+      acc[config.testType].totalCredits += config.totalCredits;
+      acc[config.testType].usedCredits += config.usedCredits;
+      acc[config.testType].availableCredits += config.availableCredits;
+      acc[config.testType].companies += 1;
+      return acc;
+    }, {} as Record<TestType, { totalCredits: number; usedCredits: number; availableCredits: number; companies: number }>);
+
+    return {
+      totalCompanies,
+      testTypeStats: stats
+    };
   }
 
-  // ============================================================================
-  // UTILITY METHODS
-  // ============================================================================
-
   /**
-   * Check and expire old credits
+   * Expire old credits based on expiry date
    */
   async expireOldCredits(): Promise<void> {
     const now = new Date();
     
-    await prisma.$transaction(async (tx) => {
-      // Find expired credits
-      const expiredCredits = await tx.companyCredit.findMany({
-        where: {
-          expiryDate: { lt: now },
-          isActive: true,
-          availableCredits: { gt: 0 }
-        }
-      });
+    const expiredConfigs = await prisma.companyTestConfig.findMany({
+      where: {
+        expiryDate: { lt: now },
+        availableCredits: { gt: 0 },
+        isActive: true
+      }
+    });
 
-      // Process each expired credit
-      for (const credit of expiredCredits) {
-        const expiredAmount = credit.availableCredits;
+    for (const config of expiredConfigs) {
+      await prisma.$transaction(async (tx) => {
+        const expiredAmount = config.availableCredits;
         
-        // Update credit record
-        await tx.companyCredit.update({
-          where: { id: credit.id },
+        // Update config to zero out expired credits
+        await tx.companyTestConfig.update({
+          where: { id: config.id },
           data: {
             availableCredits: 0,
-            isActive: false,
-            updatedAt: now
+            updatedAt: new Date()
           }
         });
 
         // Create expiry transaction
         await tx.creditTransaction.create({
           data: {
-            companyId: credit.companyId,
-            testType: credit.testType,
+            companyId: config.companyId,
+            testType: config.testType,
             transactionType: CreditTransactionType.EXPIRY,
             amount: -expiredAmount,
-            balanceBefore: expiredAmount,
+            balanceBefore: config.availableCredits,
             balanceAfter: 0,
-            description: `Credits expired on ${credit.expiryDate?.toISOString().split('T')[0]}`,
+            description: `Expired ${expiredAmount} ${config.testType} credits`,
             referenceType: 'expiry'
           }
         });
-      }
-    });
+      });
+    }
   }
 
   /**
-   * Validate test creation request
+   * Validate if company can create a test
    */
   async validateTestCreation(companyId: string, testType: TestType): Promise<{
     canCreate: boolean;
     error?: string;
     availableCredits?: number;
   }> {
-    // Check permission
-    const hasPermission = await this.hasTestPermission(companyId, testType);
-    if (!hasPermission) {
+    const config = await prisma.companyTestConfig.findUnique({
+      where: { companyId_testType: { companyId, testType } }
+    });
+
+    if (!config) {
       return {
         canCreate: false,
-        error: `Company not authorized for ${testType} tests`
+        error: `No configuration found for ${testType} tests`,
+        availableCredits: 0
       };
     }
 
-    // Check credits
-    const availableCredits = await this.getCreditBalance(companyId, testType);
-    if (availableCredits < 1) {
+    if (!config.isEnabled) {
       return {
         canCreate: false,
-        error: `Insufficient ${testType} credits`,
-        availableCredits
+        error: `${testType} tests are not enabled for this company`,
+        availableCredits: config.availableCredits
+      };
+    }
+
+    if (!config.isActive) {
+      return {
+        canCreate: false,
+        error: `${testType} test configuration is not active`,
+        availableCredits: config.availableCredits
+      };
+    }
+
+    if (config.expiryDate && config.expiryDate < new Date()) {
+      return {
+        canCreate: false,
+        error: `${testType} credits have expired`,
+        availableCredits: 0
+      };
+    }
+
+    if (config.availableCredits <= 0) {
+      return {
+        canCreate: false,
+        error: `No available ${testType} credits`,
+        availableCredits: 0
       };
     }
 
     return {
       canCreate: true,
-      availableCredits
+      availableCredits: config.availableCredits
     };
   }
 }
 
-// Export singleton instance
 export const creditService = new CreditService();
 export default creditService; 

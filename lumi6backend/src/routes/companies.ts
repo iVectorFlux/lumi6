@@ -323,15 +323,6 @@ router.post('/:companyId/tests', authenticateToken, async (req, res) => {
       },
     });
 
-    // Consume credits using new credit system
-    await creditService.consumeCredits(
-      companyId, 
-      testType, 
-      1, 
-      `Test created for candidate ${name} (${email})`,
-      test.id
-    );
-
     // Generate test link
     const testLink = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/test/${candidate.id}`;
     
@@ -345,7 +336,7 @@ router.post('/:companyId/tests', authenticateToken, async (req, res) => {
       candidateId: candidate.id,
       candidateName: name,
       testType,
-      creditsRemaining: availableCredits - 1,
+      creditsRemaining: availableCredits,
       message: 'Test created and credentials generated.'
     });
   } catch (error) {
@@ -804,22 +795,168 @@ router.get('/:companyId/stats', authenticateToken, async (req, res) => {
       ? Math.round((completedTests / totalTestsAttempted) * 100) 
       : 0;
 
-    // Get company credits
-    const company = await prisma.company.findUnique({
-      where: { id: companyId },
-      select: { credits: true }
-    });
+    // Get company credit balances (sum of available across all test types)
+    const creditBalances = await creditService.getCompanyCredits(companyId);
+    const totalAvailableCredits = creditBalances.reduce((sum, cb) => sum + cb.availableCredits, 0);
 
     res.json({
       totalCandidates,
       activeTests,
       completedTests,
       completionRate,
-      credits: company?.credits || 0
+      availableCredits: totalAvailableCredits,
+      creditBreakdown: creditBalances
     });
   } catch (error) {
     console.error('Error fetching company statistics:', error);
     res.status(500).json({ error: 'Failed to fetch company statistics' });
+  }
+});
+
+// ADD EQ TESTS ROUTES FOR COMPANY
+router.post('/:companyId/eq-tests', authenticateToken, async (req, res) => {
+  const { companyId } = req.params;
+  let { candidateName, candidateEmail, email } = req.body;
+
+  // Allow frontend alias `email`
+  if (!candidateEmail && email) candidateEmail = email;
+
+  if (req.admin?.companyId !== companyId) {
+    return res.status(403).json({ error: 'Unauthorized: You can only create tests for your own company' });
+  }
+  if (!candidateName || !candidateEmail) {
+    return res.status(400).json({ error: 'Missing candidateName or candidateEmail' });
+  }
+  try {
+    // Permission & credit check (must have at least 1 available EQ credit)
+    const hasPermission = await creditService.hasTestPermission(companyId, 'EQ');
+    if (!hasPermission) {
+      return res.status(403).json({ error: 'Company not authorized for EQ tests' });
+    }
+    const availableCredits = await creditService.getCreditBalance(companyId, 'EQ');
+    if (availableCredits <= 0) {
+      return res.status(403).json({ error: 'No available EQ credits. Please purchase more.' });
+    }
+
+    // Find or create candidate
+    let candidate = await prisma.candidate.findFirst({
+      where: { email: candidateEmail, companyId }
+    });
+    let passwordPlain: string | undefined;
+    if (!candidate) {
+      passwordPlain = Math.random().toString(36).slice(-8);
+      const hashedPw = await bcrypt.hash(passwordPlain, 10);
+      candidate = await prisma.candidate.create({
+        data: {
+          name: candidateName,
+          email: candidateEmail,
+          password: hashedPw,
+          companyId,
+          status: 'active',
+          createdBy: req.admin?.id || null
+        }
+      });
+    }
+
+    // Create EQ test
+    const test = await prisma.eQTest.create({
+      data: {
+        title: `EQ Assessment for ${candidateName}`,
+        description: 'Comprehensive Emotional Intelligence Assessment',
+        companyId
+      }
+    });
+
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const testLink = `${baseUrl}/eq-test/${test.id}?candidate=${candidate.id}`;
+
+    return res.status(201).json({
+      candidateId: candidate.id,
+      candidateName,
+      testId: test.id,
+      testLink,
+      login: candidateEmail,
+      password: passwordPlain || '[existing]',
+      creditsRemaining: availableCredits,
+      message: 'EQ test created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating EQ test (company route):', error);
+    res.status(500).json({ error: 'Failed to create EQ test' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// PROFICIENCY TEST CREATION (company admin)
+// ---------------------------------------------------------------------------
+router.post('/:companyId/proficiency-tests', authenticateToken, async (req, res) => {
+  const { companyId } = req.params;
+  const { candidateName, candidateEmail } = req.body;
+
+  if (req.admin?.companyId !== companyId) {
+    return res.status(403).json({ error: 'Unauthorized: You can only create tests for your own company' });
+  }
+  if (!candidateName || !candidateEmail) {
+    return res.status(400).json({ error: 'Missing candidateName or candidateEmail' });
+  }
+  try {
+    // Check permission & credits
+    const hasPermission = await creditService.hasTestPermission(companyId, 'PROFICIENCY');
+    if (!hasPermission) {
+      return res.status(403).json({ error: 'Company not authorized for Proficiency tests' });
+    }
+    const availableCredits = await creditService.getCreditBalance(companyId, 'PROFICIENCY');
+    if (availableCredits <= 0) {
+      return res.status(403).json({ error: 'No available Proficiency test credits. Please purchase more.' });
+    }
+
+    // Find or create candidate
+    let candidate = await prisma.candidate.findFirst({ where: { email: candidateEmail, companyId } });
+    let passwordPlain: string | undefined;
+    if (!candidate) {
+      passwordPlain = Math.random().toString(36).slice(-8);
+      const hashedPw = await bcrypt.hash(passwordPlain, 10);
+      candidate = await prisma.candidate.create({
+        data: {
+          name: candidateName,
+          email: candidateEmail,
+          password: hashedPw,
+          companyId,
+          status: 'active',
+          createdBy: req.admin?.id || null
+        }
+      });
+    }
+
+    // Create proficiency test
+    const testPasswordPlain = Math.random().toString(36).slice(-8);
+    const hashedTestPw = await bcrypt.hash(testPasswordPlain, 10);
+
+    const proficiencyTest = await prisma.proficiencyTest.create({
+      data: {
+        candidateId: candidate.id,
+        companyId,
+        status: 'active',
+        password: hashedTestPw
+      }
+    });
+
+    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const testLink = `${baseUrl}/proficiency-test/${proficiencyTest.id}`;
+
+    return res.status(201).json({
+      candidateId: candidate.id,
+      candidateName,
+      testId: proficiencyTest.id,
+      testLink,
+      login: candidateEmail,
+      password: passwordPlain || '[existing]',
+      creditsRemaining: availableCredits,
+      message: 'Proficiency test created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating Proficiency test (company route):', error);
+    res.status(500).json({ error: 'Failed to create Proficiency test' });
   }
 });
 

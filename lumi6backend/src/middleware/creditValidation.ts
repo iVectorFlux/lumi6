@@ -1,13 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { creditService } from '../services/creditService';
-
-// Define TestType enum locally until Prisma client is regenerated
-enum TestType {
-  SPEAKING = 'SPEAKING',
-  PROFICIENCY = 'PROFICIENCY',
-  EQ = 'EQ',
-  WRITING = 'WRITING'
-}
+import { TestType } from '@prisma/client';
 
 declare global {
   namespace Express {

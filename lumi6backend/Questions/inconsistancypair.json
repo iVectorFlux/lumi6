@@ -1,0 +1,434 @@
+[
+    {
+      "text": "I notice my feelings as soon as they begin.",
+      "type": "likert",
+      "module": "self-awareness",
+      "submodule": "emotional-self-awareness",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV1",
+      "isReversed": false
+    },
+    {
+      "text": "I seldom notice what I'm feeling until much later.",
+      "type": "likert",
+      "module": "self-awareness",
+      "submodule": "emotional-self-awareness",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV1",
+      "isReversed": true
+    },
+    {
+      "text": "When unexpected problems arise, I maintain my composure.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "emotional-balance",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV2",
+      "isReversed": false
+    },
+    {
+      "text": "Unexpected problems easily throw me off balance.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "emotional-balance",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV2",
+      "isReversed": true
+    },
+    {
+      "text": "I can tell when a teammate is stressed even if they try to hide it.",
+      "type": "likert",
+      "module": "social-awareness",
+      "submodule": "empathy",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV3",
+      "isReversed": false
+    },
+    {
+      "text": "I usually fail to notice when teammates are stressed.",
+      "type": "likert",
+      "module": "social-awareness",
+      "submodule": "empathy",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV3",
+      "isReversed": true
+    },
+    {
+      "text": "I encourage open communication in group projects.",
+      "type": "likert",
+      "module": "relationship-management",
+      "submodule": "teamwork",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV4",
+      "isReversed": false
+    },
+    {
+      "text": "I discourage others from sharing their ideas in teams.",
+      "type": "likert",
+      "module": "relationship-management",
+      "submodule": "teamwork",
+      "category": "reverse-pair",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "REV4",
+      "isReversed": true
+    },
+    {
+      "text": "I have never made a mistake in my professional life.",
+      "type": "likert",
+      "module": "self-awareness",
+      "submodule": "emotional-self-awareness",
+      "category": "social-desirability",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    },
+    {
+      "text": "I always treat everyone perfectly, no matter the situation.",
+      "type": "likert",
+      "module": "social-awareness",
+      "submodule": "empathy",
+      "category": "social-desirability",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    },
+    {
+      "text": "I consistently finish every task flawlessly on the first attempt.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "achievement-orientation",
+      "category": "social-desirability",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    },
+    {
+      "text": "I handle my emotions flawlessly in every situation.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "emotional-balance",
+      "category": "too-good-to-be-true",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    },
+    {
+      "text": "Every endeavor I begin turns out exactly as planned.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "achievement-orientation",
+      "category": "too-good-to-be-true",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    },
+    {
+      "text": "I instantly grasp every person's emotional state with complete accuracy.",
+      "type": "likert",
+      "module": "social-awareness",
+      "submodule": "empathy",
+      "category": "too-good-to-be-true",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    },
+    {
+      "text": "In disagreements, I openly listen to the other person’s viewpoint.",
+      "type": "likert",
+      "module": "relationship-management",
+      "submodule": "conflict-management",
+      "category": "contradiction",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "CON1"
+    },
+    {
+      "text": "In disagreements, I ignore the other person’s viewpoint.",
+      "type": "likert",
+      "module": "relationship-management",
+      "submodule": "conflict-management",
+      "category": "contradiction",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "CON1"
+    },
+    {
+      "text": "I readily adapt my plans when circumstances change.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "adaptability",
+      "category": "contradiction",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "CON2"
+    },
+    {
+      "text": "I refuse to change my plans even when circumstances demand it.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "adaptability",
+      "category": "contradiction",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "CON2"
+    },
+    {
+      "text": "I stay optimistic when facing challenges.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "positive-outlook",
+      "category": "duplication",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "DUP1"
+    },
+    {
+      "text": "Even during difficulties, I maintain a positive outlook.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "positive-outlook",
+      "category": "duplication",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "DUP1"
+    },
+    {
+      "text": "I cooperate effectively with colleagues to reach group goals.",
+      "type": "likert",
+      "module": "relationship-management",
+      "submodule": "teamwork",
+      "category": "duplication",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "DUP2"
+    },
+    {
+      "text": "Working with colleagues, I collaborate smoothly to achieve shared goals.",
+      "type": "likert",
+      "module": "relationship-management",
+      "submodule": "teamwork",
+      "category": "duplication",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ],
+      "inconsistencyPairId": "DUP2"
+    },
+    {
+      "text": "To show you are paying attention, please select “Neutral”.",
+      "type": "likert",
+      "module": "self-awareness",
+      "submodule": "emotional-self-awareness",
+      "category": "attention-check",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    },
+    {
+      "text": "If you are reading attentively, please choose “Disagree”.",
+      "type": "likert",
+      "module": "self-management",
+      "submodule": "emotional-balance",
+      "category": "attention-check",
+      "difficulty": "easy",
+      "options": [
+        { "label": "Strongly Disagree", "value": "Strongly Disagree", "score": 0 },
+        { "label": "Disagree", "value": "Disagree", "score": 17 },
+        { "label": "Slightly Disagree", "value": "Slightly Disagree", "score": 33 },
+        { "label": "Neutral", "value": "Neutral", "score": 50 },
+        { "label": "Slightly Agree", "value": "Slightly Agree", "score": 67 },
+        { "label": "Agree", "value": "Agree", "score": 83 },
+        { "label": "Strongly Agree", "value": "Strongly Agree", "score": 100 }
+      ]
+    }
+  ]

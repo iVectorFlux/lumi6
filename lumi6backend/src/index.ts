@@ -22,6 +22,7 @@ import eqRoutes from './routes/eqRoutes';
 import questionUploadRoutes from './routes/questionUpload';
 import writingTestsRoutes from './routes/writingTests';
 import creditRoutes from './routes/credits';
+import eqQuestionsRoutes from './routes/eqQuestions';
 
 
 // Import security and logging middleware
@@ -109,6 +110,7 @@ app.use('/api/eq', apiRateLimit, eqRoutes);
 app.use('/api/question-upload', uploadRateLimit, validateFileUpload, questionUploadRoutes);
 app.use('/api/writing-tests', apiRateLimit, writingTestsRoutes);
 app.use('/api/credits', apiRateLimit, creditRoutes);
+app.use('/api/eq-questions', apiRateLimit, eqQuestionsRoutes);
 
 
 // Health check endpoint

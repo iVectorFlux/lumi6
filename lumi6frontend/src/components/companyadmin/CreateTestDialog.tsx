@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import React from 'react';
+import TestCredentialsCard from './TestCredentialsCard';
 
 interface CreateTestDialogProps {
   open: boolean;
@@ -297,111 +298,20 @@ Results will be available immediately after completion.`;
             </DialogFooter>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mic className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className={designTokens.typography.heading4}>
-                Speaking Test Created Successfully!
-              </h3>
-              <p className={designTokens.typography.caption}>
-                Test credentials have been generated for {result.candidateName}
-              </p>
-            </div>
-
-            <Card>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                    Candidate:
-                  </span>
-                  <span className={designTokens.typography.bodySmall}>
-                    {result.candidateName}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                    Login ID:
-                  </span>
-                  <span className={cn(designTokens.typography.bodySmall, 'font-mono bg-gray-100 px-2 py-1 rounded')}>
-                    {result.login}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                    Password:
-                  </span>
-                  <span className={cn(designTokens.typography.bodySmall, 'font-mono bg-gray-100 px-2 py-1 rounded')}>
-                    {result.password}
-                  </span>
-                </div>
-                
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between items-start">
-                    <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                      Test Link:
-                    </span>
-                    <a
-                      href={result.testLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        designTokens.typography.bodySmall,
-                        'text-blue-600 hover:text-blue-800 flex items-center gap-1 max-w-xs break-all'
-                      )}
-                    >
-                      {result.testLink}
-                      <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                    </a>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <div className={cn(designTokens.typography.bodySmall, 'text-blue-800 font-medium mb-2')}>
-                Instructions for Candidate
-              </div>
-              <div className={cn(designTokens.typography.captionSmall, 'text-blue-700 space-y-1')}>
-                <p>• Click the test link and enter your credentials</p>
-                <p>• Allow camera and microphone access when prompted</p>
-                <p>• Ensure good lighting and face visibility</p>
-                <p>• Complete all speaking prompts clearly</p>
-                <p>• Results will be available immediately after completion</p>
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2">
-              <Button
-                variant="outline"
-                onClick={handleCopyCredentials}
-                className="flex-1"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Credentials
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleSendEmail}
-                className="flex-1"
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Send Email
-              </Button>
-              
-              <Button onClick={handleReset} className="flex-1">
-                Create Another
-              </Button>
-              
-              <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Close
-              </Button>
-            </DialogFooter>
-          </div>
+          <TestCredentialsCard
+            accentColor="blue-600"
+            icon={<Mic className="h-8 w-8 text-blue-600" />}
+            heading="Speaking Test Created Successfully!"
+            candidateName={result.candidateName}
+            login={result.login}
+            password={result.password}
+            testLink={result.testLink}
+            instructions={[]}
+            onCopy={handleCopyCredentials}
+            onSend={handleSendEmail}
+            onCreateAnother={handleReset}
+            onClose={() => handleOpenChange(false)}
+          />
         )}
       </DialogContent>
     </Dialog>

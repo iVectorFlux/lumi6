@@ -1,22 +1,7 @@
 import express, { Request, Response } from 'express';
 import { authenticateToken } from '../middleware/auth';
 import { creditService } from '../services/creditService';
-
-// Define enums locally until Prisma client is regenerated
-enum TestType {
-  SPEAKING = 'SPEAKING',
-  PROFICIENCY = 'PROFICIENCY',
-  EQ = 'EQ',
-  WRITING = 'WRITING'
-}
-
-enum CreditTransactionType {
-  PURCHASE = 'PURCHASE',
-  CONSUMPTION = 'CONSUMPTION',
-  REFUND = 'REFUND',
-  ADJUSTMENT = 'ADJUSTMENT',
-  EXPIRY = 'EXPIRY'
-}
+import { TestType, CreditTransactionType } from '@prisma/client';
 
 const router = express.Router();
 

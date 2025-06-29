@@ -1,0 +1,17 @@
+{
+  "assessmentId": "8kjqjsux",
+  "transcript": "Transcription not implemented yet",
+  "evaluation": {
+    "cefr": "A1",
+    "score": 30,
+    "fluency": 1,
+    "grammar": 1,
+    "vocabulary": 1,
+    "pronunciation": 1,
+    "coherence": 1,
+    "feedback": "Unable to evaluate the test as there is no transcription available. Please provide the required transcription to proceed with the test evaluation."
+  },
+  "status": "complete",
+  "error": "",
+  "candidateTestId": ""
+}

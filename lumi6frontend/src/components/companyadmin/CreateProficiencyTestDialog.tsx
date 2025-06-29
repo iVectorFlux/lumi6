@@ -10,6 +10,7 @@ import { designTokens } from '@/design-system/tokens';
 import { BookOpen, Copy, Mail, Loader2, ExternalLink, Clock, Target, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
+import TestCredentialsCard from './TestCredentialsCard';
 
 interface CreateProficiencyTestDialogProps {
   open: boolean;
@@ -301,119 +302,21 @@ Results will show your CEFR level (A1-C2) with detailed scoring.`;
             </DialogFooter>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BookOpen className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className={designTokens.typography.heading4}>
-                Proficiency Test Created Successfully!
-              </h3>
-              <p className={designTokens.typography.caption}>
-                CEFR test credentials have been generated for {result.candidateName}
-              </p>
-            </div>
-
-            <Card>
-              <CardContent className="p-4 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                    Candidate:
-                  </span>
-                  <span className={designTokens.typography.bodySmall}>
-                    {result.candidateName}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                    Login ID:
-                  </span>
-                  <span className={cn(designTokens.typography.bodySmall, 'font-mono bg-gray-100 px-2 py-1 rounded')}>
-                    {result.login}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                    Password:
-                  </span>
-                  <span className={cn(designTokens.typography.bodySmall, 'font-mono bg-gray-100 px-2 py-1 rounded')}>
-                    {result.password}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center">
-                  <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                    Test ID:
-                  </span>
-                  <span className={cn(designTokens.typography.bodySmall, 'font-mono bg-gray-100 px-2 py-1 rounded')}>
-                    {result.testId}
-                  </span>
-                </div>
-                
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between items-start">
-                    <span className={cn(designTokens.typography.bodySmall, 'font-medium text-gray-700')}>
-                      Test Link:
-                    </span>
-                    <a
-                      href={result.testLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        designTokens.typography.bodySmall,
-                        'text-green-600 hover:text-green-800 flex items-center gap-1 max-w-xs break-all'
-                      )}
-                    >
-                      {result.testLink}
-                      <ExternalLink className="h-3 w-3 flex-shrink-0" />
-                    </a>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <div className={cn(designTokens.typography.bodySmall, 'text-green-800 font-medium mb-2')}>
-                Instructions for Candidate
-              </div>
-              <div className={cn(designTokens.typography.captionSmall, 'text-green-700 space-y-1')}>
-                <p>• Click the test link and enter your credentials</p>
-                <p>• Answer all 40 questions to the best of your ability</p>
-                <p>• Take your time - no rush, but aim for 45-60 minutes</p>
-                <p>• Results will show your CEFR level immediately</p>
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2">
-              <Button
-                variant="outline"
-                onClick={handleCopyCredentials}
-                className="flex-1"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Credentials
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleSendEmail}
-                className="flex-1"
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Send Email
-              </Button>
-              
-              <Button onClick={handleReset} className="flex-1">
-                Create Another
-              </Button>
-              
-              <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Close
-              </Button>
-            </DialogFooter>
-          </div>
+          <TestCredentialsCard
+            accentColor="green-600"
+            icon={<BookOpen className="h-8 w-8 text-green-600" />}
+            heading="Proficiency Test Created Successfully!"
+            candidateName={result.candidateName}
+            login={result.login}
+            password={result.password}
+            testId={result.testId}
+            testLink={result.testLink}
+            instructions={[]}
+            onCopy={handleCopyCredentials}
+            onSend={handleSendEmail}
+            onCreateAnother={handleReset}
+            onClose={() => handleOpenChange(false)}
+          />
         )}
       </DialogContent>
     </Dialog>

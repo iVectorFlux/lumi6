@@ -703,32 +703,20 @@ router.post('/companies', authenticateToken, requireSuperAdmin, async (req: Requ
         },
       });
 
-      // 2. Create test permissions
+      // 2. Create consolidated test configurations (permissions + credits)
       for (const testType of testPermissions) {
-        await tx.companyTestPermission.create({
+        const creditAmount = credits[testType as keyof typeof credits];
+        await tx.companyTestConfig.create({
           data: {
             companyId: company.id,
             testType: testType as any,
-            isEnabled: true
+            isEnabled: true,
+            totalCredits: creditAmount,
+            usedCredits: 0,
+            availableCredits: creditAmount,
+            isActive: true
           }
         });
-      }
-
-      // 3. Create credit allocations for enabled test types
-      for (const testType of testPermissions) {
-        const creditAmount = credits[testType as keyof typeof credits];
-        if (creditAmount > 0) {
-          await tx.companyCredit.create({
-            data: {
-              companyId: company.id,
-              testType: testType as any,
-              totalCredits: creditAmount,
-              usedCredits: 0,
-              availableCredits: creditAmount,
-              isActive: true
-            }
-          });
-        }
       }
 
       // 4. Create the company admin for the company (if not exists)
